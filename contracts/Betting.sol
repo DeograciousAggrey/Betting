@@ -57,13 +57,34 @@ contract Betting {
         //Check if the required number of players has been met 
         if(numberOfWagers >= MAX_NUMBER_OF_WAGERS) {
             announceWinners();
+            
+            //start a new game
+            //Delete all the player addresses mappings
+            removeAllPlayersFromMapping();
+            
+            //Delete the player addresses
+            delete playerAddresses;
+            
+            //reset the variables
+            totalWager = 0;
+            numberOfWagers = 0;
+            winningNumber = 999;
+            
         }
         
         //Emit the event to inform the client about the status of the game
         emit status(numberOfWagers, MAX_NUMBER_OF_WAGERS);
 
 
-    }    
+    }  
+    
+    
+    //Remove players from mappings
+    function removeAllPlayersFromMapping() private {
+        for (uint i = 0; i  < playerAddresses.length; i++){
+            delete playerAddressesMapping[playerAddresses[i]];
+        }
+    }
         
         //Draws a random number and calculate the winnings
         function announceWinners() private {
@@ -98,6 +119,11 @@ contract Betting {
           for (uint j = 0; j < winnersCount; j++){
               winners[j].transfer((playerDetails[winners[j]].amountWagered/totalWinningWager) * totalWager);
               
+          }
+          
+          //If there's no winner transfer all the ether to the owner if the contract
+          if(winnersCount == 0) {
+              owner.transfer(address(this).balance);
           }
           
           

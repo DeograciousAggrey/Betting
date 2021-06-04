@@ -17,7 +17,16 @@ contract Betting {
     }
     mapping (address => Player) playerDetails;
     
-    
+    //Event to announce the winning number
+    event WinningNumber ( uint number);
+
+    //Event to display the status of the game
+    event status (uint players, uint maxPlayers);    
+
+
+
+
+
     //Constructor for the contract
     constructor(uint _minWager) public {
         owner = msg.sender;
@@ -50,12 +59,21 @@ contract Betting {
             announceWinners();
         }
         
+        //Emit the event to inform the client about the status of the game
+        emit status(numberOfWagers, MAX_NUMBER_OF_WAGERS);
+
+
     }    
         
         //Draws a random number and calculate the winnings
         function announceWinners() private {
-          winningNumber = uint (keccak256(abi.encodePacked(block.timestamp))) % MAX_WINNING_NUMBER + 1; 
-          
+         // winningNumber = uint (keccak256(abi.encodePacked(block.timestamp))) % MAX_WINNING_NUMBER + 1; 
+          winningNumber = 1;
+
+          //Emit the event to announce the winning number
+          emit WinningNumber(winningNumber);
+
+
           //Create an array to store all the winners
           address payable [MAX_NUMBER_OF_WAGERS] memory winners;
           
@@ -102,16 +120,8 @@ contract Betting {
         }
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    function getStatus() public view returns (uint, uint) {
+        return (numberOfWagers, MAX_NUMBER_OF_WAGERS);
+    }
+     
 }
